@@ -27,7 +27,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - attach_workspace:
-          at: dev-cache
+          at: ./
       - run:
           name: Install Meteor
           command: |
@@ -36,7 +36,7 @@ jobs:
           name: Meteor NPM Install
           command: meteor npm install
       - persist_to_workspace:
-          root: /root/reaction-app
+          root: .
           path:
             - node_modules
 
@@ -130,7 +130,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: /root/reaction-app
+          at: ./
       - run:
           name: Run Lint
           command: |
