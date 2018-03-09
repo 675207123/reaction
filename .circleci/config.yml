@@ -35,13 +35,8 @@ jobs:
       - run:
           name: Meteor NPM Install
           command: meteor npm install
-      - run:
-          name: Save Installed Packages
-          command: cp -R node_modules dev-cache/node_modules
       - persist_to_workspace:
           root: node_modules
-          paths:
-            - *
 
   docker-build:
     <<: *defaults
@@ -159,10 +154,6 @@ workflows:
   build_and_test:
     jobs:
       - install_dep
-      # - test:
-      #     context: reaction-validation
-      #     requires:
-      #       - docker-test-build
       - eslint:
           requires:
             - install_dep
