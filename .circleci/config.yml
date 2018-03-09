@@ -36,7 +36,9 @@ jobs:
           name: Meteor NPM Install
           command: meteor npm install
       - persist_to_workspace:
-          root: node_modules
+          root: /root/reaction-app
+          path:
+            - node_modules
 
   docker-build:
     <<: *defaults
@@ -128,7 +130,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: node_modules
+          at: /root/reaction-app
       - run:
           name: Run Lint
           command: |
