@@ -52,10 +52,6 @@ jobs:
           key: node_modules
           paths:
             - ./node_modules
-      - run:
-          name: Reaction tests
-          command: |
-            reaction test
 
   docker-build:
     <<: *defaults
