@@ -21,24 +21,41 @@ defaults: &defaults
     - image: circleci/node:8-stretch
 
 jobs:
-  install_dep:
+  test:
     <<: *defaults
     steps:
       - checkout
       - setup_remote_docker
-      - attach_workspace:
-          at: ./
+      - restore_cache:
+          name: Restoring Meteor cache
+          key: meteor
       - run:
           name: Install Meteor
           command: |
-            curl https://install.meteor.com | /bin/sh
+            if [[ -f ~/.meteor/meteor ]]; then \
+              printf "\nMeteor already installed. Creating symlink.\n"
+              ln -s ~/.meteor/meteor /usr/local/bin/meteor;
+            else
+              printf "\Installing Meteor\n"
+              curl https://install.meteor.com | /bin/sh
+            fi
+      - save_cache:
+          name: Saving Meteor to cache
+          key: meteor
+          paths:
+            - ~/.meteor
       - run:
           name: Meteor NPM Install
           command: meteor npm install
-      - persist_to_workspace:
-          root: .
-          path:
-            - node_modules
+      - save_cache:
+          name: Saving Installed Node packages
+          key: node_modules
+          paths:
+            - ./node_modules
+      - run:
+          name: Reaction tests
+          command: |
+            reaction test
 
   docker-build:
     <<: *defaults
@@ -129,27 +146,13 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - attach_workspace:
-          at: ./
+      - restore_cache:
+          name: Restoring Installed Packages
+          key: node_modules
       - run:
           name: Run Lint
           command: |
             npm run lint
-
-  test:
-    <<: *defaults
-    steps:
-      - setup_remote_docker
-      - attach_workspace:
-          at: docker-cache
-      - run:
-          name: Load Test Docker Image
-          command: |
-            docker load < docker-cache/docker-dev-image.tar
-      - run:
-          name: Run tests
-          command: |
-            reaction test
 
 workflows:
   version: 2
@@ -158,4 +161,4 @@ workflows:
       - install_dep
       - eslint:
           requires:
-            - install_dep
+            - test
