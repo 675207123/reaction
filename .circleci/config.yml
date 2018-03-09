@@ -51,7 +51,7 @@ jobs:
           name: Saving Installed Node packages
           key: node_modules
           paths:
-            - ./node_modules
+            - ~/reaction-app/node_modules
 
   docker-build:
     <<: *defaults
